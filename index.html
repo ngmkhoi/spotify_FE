@@ -544,7 +544,19 @@
                         </h1>
 
                         <form class="auth-form-content">
-                            <div class="form-group invalid">
+                           <div class="form-group">
+                                <input
+                                    type="text"
+                                    placeholder="Username"
+                                    class="form-input"
+                                    id="signupUsername"
+                                />
+                                <div class="error-message">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Username phải có ít nhất 3 ký tự</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <input
                                     type="email"
                                     placeholder="Email address"
@@ -553,13 +565,9 @@
                                 />
                                 <div class="error-message">
                                     <i class="fas fa-info-circle"></i>
-                                    <span
-                                        >Please enter a valid email
-                                        address</span
-                                    >
+                                    <span>Please enter a valid email address</span>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <input
                                     type="password"
@@ -569,10 +577,19 @@
                                 />
                                 <div class="error-message">
                                     <i class="fas fa-info-circle"></i>
-                                    <span
-                                        >Password must be at least 8
-                                        characters</span
-                                    >
+                                    <span>Password must be at least 6 characters, including uppercase, lowercase, and number</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    class="form-input"
+                                    id="signupConfirmPassword"
+                                />
+                                <div class="error-message">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Confirm password does not match</span>
                                 </div>
                             </div>
 
@@ -639,6 +656,6 @@
             </div>
         </div>
 
-        <script src="main.js"></script>
+        <script type="module" src="main.js"></script>
     </body>
 </html>
