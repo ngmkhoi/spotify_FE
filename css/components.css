@@ -909,6 +909,18 @@
     object-fit: cover;
 }
 
+/* User Greeting */
+.hidden {
+    display: none;
+}
+
+#userGreeting {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-left: var(--spacing-sm);
+}
+
 /* User Dropdown */
 .user-dropdown {
     position: absolute;

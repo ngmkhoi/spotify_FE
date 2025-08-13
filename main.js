@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const authButtons = document.querySelector('.auth-buttons');
     const userAvatar = document.getElementById("userAvatar");
     const userDropdown = document.getElementById("userDropdown");
+    const userGreeting = document.getElementById("userGreeting");
 
     const signupFormElement = signupForm?.querySelector('.auth-form-content');
     const signupUsernameInput = document.getElementById('signupUsername');
@@ -56,17 +57,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const user = response.user || response;
+                const displayName = user.username || user.display_name || 'User';
                 authButtons.style.display = 'none';
                 userAvatar.style.display = 'block';
-                userAvatar.innerHTML = `<img src="${user.avatar_url || 'default-avatar.png'}" alt="${user.display_name || 'User'}" style="width: 32px; height: 32px; border-radius: 50%;">`;
-                userAvatar.title = user.display_name || 'User';
+                userAvatar.innerHTML = `<img src="${user.avatar_url || 'default-avatar.png'}" alt="${displayName}" style="width: 32px; height: 32px; border-radius: 50%;">`;
+                userAvatar.title = `Xin chào ${displayName}`;
+                if (userGreeting) {
+                    userGreeting.textContent = `Xin chào ${displayName}`;
+                    userGreeting.classList.remove('hidden');
+                }
             } catch (error) {
                 authButtons.style.display = 'flex';
                 userAvatar.style.display = 'none';
+                if (userGreeting) userGreeting.classList.add('hidden');
             }
         } else {
             authButtons.style.display = 'flex';
             userAvatar.style.display = 'none';
+            if (userGreeting) userGreeting.classList.add('hidden');
         }
     }
 
@@ -163,7 +171,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const credential = {
                 email: signupEmailInput.value,
-                password: signupPasswordInput.value
+                password: signupPasswordInput.value,
+                username: signupUsernameInput.value,
+                display_name: signupUsernameInput.value
             };
 
             try {
@@ -171,7 +181,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 localStorage.setItem('access_token', access_token);
 
                 // Tự động đăng nhập
-                const loginResponse = await httpRequest.post('auth/login', credential);
+                const loginResponse = await httpRequest.post('auth/login', {
+                    email: credential.email,
+                    password: credential.password
+                });
                 localStorage.setItem('access_token', loginResponse.access_token);
 
                 // Cập nhật header UI
@@ -184,7 +197,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const errorMessage = error.response?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
                 signupEmailFormGroup.classList.add('invalid');
                 signupEmailFormGroup.querySelector('.error-message span').textContent = 
-                    errorMessage.toLowerCase().includes('email') ? 'Email đã tồn tại' : errorMessage;
+                    errorMessage.toLowerCase().includes('email') ? 'Email đã tồn tại' : 
+                    errorMessage.toLowerCase().includes('username') ? 'Username đã tồn tại' : errorMessage;
             }
         });
     }
@@ -213,6 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem('access_token');
         authButtons.style.display = 'flex';
         userAvatar.style.display = 'none';
+        if (userGreeting) userGreeting.classList.add('hidden');
     });
 
     // Khởi tạo header
