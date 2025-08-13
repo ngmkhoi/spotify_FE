@@ -18,15 +18,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const userGreeting = document.getElementById("userGreeting");
 
     const signupFormElement = signupForm?.querySelector('.auth-form-content');
-    const signupUsernameInput = document.getElementById('signupUsername');
     const signupEmailInput = document.getElementById('signupEmail');
     const signupPasswordInput = document.getElementById('signupPassword');
     const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword');
-    const signupUsernameFormGroup = signupUsernameInput?.closest('.form-group');
     const signupEmailFormGroup = signupEmailInput?.closest('.form-group');
     const signupPasswordFormGroup = signupPasswordInput?.closest('.form-group');
     const signupConfirmPasswordFormGroup = signupConfirmPasswordInput?.closest('.form-group');
 
+    const loginFormElement = loginForm?.querySelector('.auth-form-content');
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const loginEmailFormGroup = loginEmailInput?.closest('.form-group');
+    const loginPasswordFormGroup = loginPasswordInput?.closest('.form-group');
+
+    // Function to sanitize input
+    function sanitizeInput(input) {
+    return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    
     // Function to show Toast message
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
@@ -50,26 +59,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to update header UI
     async function updateHeader() {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            try {
-                const response = await httpRequest.get('users/me', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const user = response.user || response;
-                const displayName = user.username || user.display_name || 'User';
-                authButtons.style.display = 'none';
-                userAvatar.style.display = 'block';
-                userAvatar.innerHTML = `<img src="${user.avatar_url || 'default-avatar.png'}" alt="${displayName}" style="width: 32px; height: 32px; border-radius: 50%;">`;
-                userAvatar.title = `Xin chào ${displayName}`;
-                if (userGreeting) {
-                    userGreeting.textContent = `Xin chào ${displayName}`;
-                    userGreeting.classList.remove('hidden');
-                }
-            } catch (error) {
-                authButtons.style.display = 'flex';
-                userAvatar.style.display = 'none';
-                if (userGreeting) userGreeting.classList.add('hidden');
+    const token = localStorage.getItem('access_token');
+    let user = JSON.parse(localStorage.getItem('current_user')); // Kiểm tra user trong localStorage trước
+
+    if (token && !user) {
+        try {
+            const response = await httpRequest.get('users/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            user = response.user || response;
+            // Sanitize trước khi lưu
+            user.email = sanitizeInput(user.email || 'User');
+            user.avatar_url = sanitizeInput(user.avatar_url || './icon/person-circle.svg');
+            localStorage.setItem('current_user', JSON.stringify(user));
+        } catch (error) {
+            console.error('Lỗi khi lấy thông tin user:', error.message);
+            localStorage.removeItem('current_user');
+        }
+    }
+
+    if (token && user) {
+        const displayName = sanitizeInput(user.email || 'User');
+        const avatarUrl = sanitizeInput(user.avatar_url || './icon/person-circle.svg');
+
+        authButtons.style.display = 'none';
+        userAvatar.style.display = 'block';
+
+        // Tạo img thay vì innerHTML
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = displayName;
+        img.style.width = '32px';
+        img.style.height = '32px';
+        img.style.borderRadius = '50%';
+        userAvatar.innerHTML = '';
+        userAvatar.appendChild(img);
+
+        userAvatar.title = `Xin chào ${displayName}`;
+            if (userGreeting) {
+                userGreeting.textContent = `Xin chào ${displayName}`;
+                userGreeting.classList.remove('hidden');
             }
         } else {
             authButtons.style.display = 'flex';
@@ -100,6 +129,25 @@ document.addEventListener("DOMContentLoaded", function () {
     function closeModal() {
         authModal.classList.remove("show");
         document.body.style.overflow = "auto";
+    }
+
+    //Clear forms
+    function clearForm(formElement) {
+        // Xóa giá trị các input
+        const inputs = formElement.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+
+        // Xóa trạng thái lỗi
+        const formGroups = formElement.querySelectorAll('.form-group');
+        formGroups.forEach(formGroup => {
+            formGroup.classList.remove('invalid');
+            const errorSpan = formGroup.querySelector('.error-message span');
+            if (errorSpan) {
+                errorSpan.textContent = '';
+            }
+        });
     }
 
     // Open modal with Sign Up form
@@ -142,66 +190,123 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Signup Form Validation
-    if (signupUsernameInput && signupEmailInput && signupPasswordInput && signupConfirmPasswordInput &&
-        signupUsernameFormGroup && signupEmailFormGroup && signupPasswordFormGroup && signupConfirmPasswordFormGroup) {
-        // Xóa class invalid ban đầu
-        signupUsernameFormGroup.classList.remove('invalid');
-        signupEmailFormGroup.classList.remove('invalid');
-        signupPasswordFormGroup.classList.remove('invalid');
-        signupConfirmPasswordFormGroup.classList.remove('invalid');
+    // Xóa class invalid ban đầu
+    signupEmailFormGroup.classList.remove('invalid');
+    signupPasswordFormGroup.classList.remove('invalid');
+    signupConfirmPasswordFormGroup.classList.remove('invalid');
 
-        // Validate thời gian thực khi blur
-        signupUsernameInput.addEventListener('blur', () => validateField(signupUsernameInput, 'signup'));
-        signupEmailInput.addEventListener('blur', () => validateField(signupEmailInput, 'signup'));
-        signupPasswordInput.addEventListener('blur', () => validateField(signupPasswordInput, 'signup'));
-        signupConfirmPasswordInput.addEventListener('blur', () => validateField(signupConfirmPasswordInput, 'signup', signupPasswordInput.value));
+    // Validate thời gian thực khi blur
+    signupEmailInput.addEventListener('blur', () => validateField(signupEmailInput, 'signup'));
+    signupPasswordInput.addEventListener('blur', () => validateField(signupPasswordInput, 'signup'));
+    signupConfirmPasswordInput.addEventListener('blur', () => validateField(signupConfirmPasswordInput, 'signup', signupPasswordInput.value));
 
-        // Xử lý submit signup
-        signupFormElement.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Xử lý submit signup
+    signupFormElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const isUsernameValid = validateField(signupUsernameInput, 'signup');
-            const isEmailValid = validateField(signupEmailInput, 'signup');
-            const isPasswordValid = validateField(signupPasswordInput, 'signup');
-            const isConfirmPasswordValid = validateField(signupConfirmPasswordInput, 'signup', signupPasswordInput.value);
+        const isEmailValid = validateField(signupEmailInput, 'signup');
+        const isPasswordValid = validateField(signupPasswordInput, 'signup');
+        const isConfirmPasswordValid = validateField(signupConfirmPasswordInput, 'signup', signupPasswordInput.value);
 
-            if (!isUsernameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
-                return;
-            }
+        if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+            return;
+        }
 
-            const credential = {
-                email: signupEmailInput.value,
-                password: signupPasswordInput.value,
-                username: signupUsernameInput.value,
-                display_name: signupUsernameInput.value
-            };
+        const credential = {
+            email: signupEmailInput.value,
+            password: signupPasswordInput.value,
+        };
 
-            try {
-                const { user, access_token } = await httpRequest.post('auth/register', credential);
-                localStorage.setItem('access_token', access_token);
+        try {
+            const { user, access_token } = await httpRequest.post('auth/register', credential);
+            localStorage.setItem('access_token', access_token);
+            localStorage.setItem('current_user', JSON.stringify(user));
 
-                // Tự động đăng nhập
-                const loginResponse = await httpRequest.post('auth/login', {
-                    email: credential.email,
-                    password: credential.password
-                });
-                localStorage.setItem('access_token', loginResponse.access_token);
+            // Tự động đăng nhập
+            const loginResponse = await httpRequest.post('auth/login', {
+                email: credential.email,
+                password: credential.password
+            });
+            
+            localStorage.setItem('access_token', loginResponse.access_token);
+            localStorage.setItem('current_user', JSON.stringify(loginResponse.user || user));
 
-                // Cập nhật header UI
-                await updateHeader();
+            // Cập nhật header UI
+            await updateHeader();
 
-                // Hiển thị Toast và đóng modal
-                showToast('Đăng ký thành công!', 'success');
-                closeModal();
-            } catch (error) {
-                const errorMessage = error.response?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
-                signupEmailFormGroup.classList.add('invalid');
-                signupEmailFormGroup.querySelector('.error-message span').textContent = 
-                    errorMessage.toLowerCase().includes('email') ? 'Email đã tồn tại' : 
-                    errorMessage.toLowerCase().includes('username') ? 'Username đã tồn tại' : errorMessage;
-            }
-        });
-    }
+            // Xóa form và trạng thái lỗi
+            clearForm(signupFormElement);
+
+            // Hiển thị Toast và đóng modal
+            showToast('Đăng ký thành công!', 'success');
+            closeModal();
+        } catch (error) {
+            const errorMessage = error.response?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
+            signupEmailFormGroup.classList.add('invalid');
+            signupEmailFormGroup.querySelector('.error-message span').textContent = errorMessage;
+        }
+    });
+
+    // Login Form Validation
+    // Xóa class invalid ban đầu
+    loginEmailFormGroup.classList.remove('invalid');
+    loginPasswordFormGroup.classList.remove('invalid');
+
+    // Validate thời gian thực khi blur
+    loginEmailInput.addEventListener('blur', () => validateField(loginEmailInput, 'login'));
+    loginPasswordInput.addEventListener('blur', () => validateField(loginPasswordInput, 'login'));
+
+    // Xử lý submit login
+    loginFormElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const isEmailValid = validateField(loginEmailInput, 'login');
+        const isPasswordValid = validateField(loginPasswordInput, 'login');
+
+        if (!isEmailValid || !isPasswordValid) {
+            return;
+        }
+
+        const credential = {
+            email: loginEmailInput.value,
+            password: loginPasswordInput.value
+        };
+
+        try{
+            const loginResponse = await httpRequest.post('auth/login', credential);
+            localStorage.setItem('access_token', loginResponse.access_token);
+
+            const userRespone = await httpRequest.get('users/me', {
+                headers: { Authorization: `Bearer ${loginResponse.access_token}` }
+            })
+            const user = userRespone.user || userRespone;
+            localStorage.setItem('current_user', JSON.stringify(user));
+
+            await updateHeader();
+
+            // Xóa form và trạng thái lỗi
+            clearForm(loginFormElement);
+
+            showToast('Đăng nhập thành công!', 'success');
+            
+            closeModal();
+        }catch (error) {
+            const errorMessage = error.response?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
+        // Hiển thị lỗi cụ thể, giả sử API trả về message chứa 'email' hoặc 'password'
+        if (errorMessage.toLowerCase().includes('email')) {
+            loginEmailFormGroup.classList.add('invalid');
+            loginEmailFormGroup.querySelector('.error-message span').textContent = 'Email không tồn tại';
+        } else if (errorMessage.toLowerCase().includes('password')) {
+            loginPasswordFormGroup.classList.add('invalid');
+            loginPasswordFormGroup.querySelector('.error-message span').textContent = 'Mật khẩu không đúng';
+        } else {
+            // Lỗi chung, hiển thị ở cả hai
+            loginEmailFormGroup.classList.add('invalid');
+            loginPasswordFormGroup.classList.add('invalid');
+            loginEmailFormGroup.querySelector('.error-message span').textContent = errorMessage;
+        }
+        }
+    })
 
     // User Menu Dropdown Functionality
     userAvatar?.addEventListener("click", function (e) {
@@ -221,13 +326,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    //Logout Button Functionality
     const logoutBtn = document.getElementById("logoutBtn");
-    logoutBtn?.addEventListener("click", function () {
+    logoutBtn?.addEventListener("click", async function () {
         userDropdown.classList.remove("show");
-        localStorage.removeItem('access_token');
-        authButtons.style.display = 'flex';
-        userAvatar.style.display = 'none';
-        if (userGreeting) userGreeting.classList.add('hidden');
+        localStorage.clear();
+        await updateHeader();
+        showToast('Đăng xuất thành công!', 'success');
     });
 
     // Khởi tạo header

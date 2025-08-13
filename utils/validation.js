@@ -6,21 +6,10 @@ export function validateEmail(email) {
     return { valid: true };
 }
 
-export function validateUsername(username) {
-    if (!username || username.length < 3) {
-        return { valid: false, message: 'Username phải có ít nhất 3 ký tự' };
-    }
-    return { valid: true };
-}
-
 export function validateSignup(email, password, username, confirmPassword) {
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
         return emailValidation;
-    }
-    const usernameValidation = validateUsername(username);
-    if (!usernameValidation.valid) {
-        return usernameValidation;
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!password || !passwordRegex.test(password)) {
@@ -54,16 +43,6 @@ export function validateField(field, formType, passwordValue = '') {
     }
     if (field.type === 'email') {
         const validation = validateEmail(field.value);
-        if (!validation.valid) {
-            formGroup.classList.add('invalid');
-            errorSpan.textContent = validation.message;
-            return false;
-        } else {
-            formGroup.classList.remove('invalid');
-            return true;
-        }
-    } else if (field.type === 'text' && field.id === 'signupUsername') {
-        const validation = validateUsername(field.value);
         if (!validation.valid) {
             formGroup.classList.add('invalid');
             errorSpan.textContent = validation.message;
