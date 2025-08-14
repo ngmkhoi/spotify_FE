@@ -341,11 +341,169 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Other functionality
 document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        const { artists } = await httpRequest.get('artists');
-        console.log(artists);
-    } catch (error) {
-        console.error('Error fetching artists:', error.message);
-        alert('Không thể lấy danh sách nghệ sĩ!');
+
+    // Get DOM elements
+    const biggestHitsContainer = document.querySelector(".hits-grid");
+    const popularArtistsContainer = document.querySelector(".artists-grid");
+
+    if(!biggestHitsContainer || !popularArtistsContainer) {
+        console.error('Không tìm thấy các phần tử cần thiết trong DOM');
+        return;
     }
+
+    // Fetch biggest hits
+    async function fetchBiggestHits() {
+        try {
+            const response = await httpRequest.get('tracks/trending?limit=20');
+            const tracks = response.tracks || [];
+            if (tracks.length === 0) {
+                showToast('Không có tracks trending nào!', 'error');
+                return [];
+            } 
+            return tracks
+
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu trending tracks:', error.message);
+            showToast('Không thể tải Today’s biggest hits!', 'error');
+            return [];
+        }
+    }
+
+    // Render biggest hits
+    function renderBiggestHits(tracks) {
+        biggestHitsContainer.innerHTML = ''; // Xóa nội dung cũ
+
+        if(tracks.length === 0) {
+            biggestHitsContainer.innerHTML = '<p class="no-data">Không có dữ liệu tracks!</p>';
+            return;
+        }
+
+        tracks.forEach(track => {
+            const hitItem = document.createElement('div');
+            hitItem.className = 'hit-card';
+
+            //Tạo div hit-card-cover
+            const hitCardCover = document.createElement('div');
+            hitCardCover.className = 'hit-card-cover';
+
+            // Tạo thẻ img
+            const img = document.createElement('img');
+            img.src = track.image_url;
+            img.alt = track.title;
+            hitCardCover.appendChild(img);
+
+            // Tạo button hit-play-btn
+            const playButton = document.createElement('button');
+            playButton.className = 'hit-play-btn';
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
+            hitCardCover.appendChild(playButton);
+
+            // Tạo div hit-card-info
+            const hitCardInfo = document.createElement('div');
+            hitCardInfo.className = 'hit-card-info';
+
+            // Tạo h3 hit-card-title
+            const hitCardTitle = document.createElement('h3');
+            hitCardTitle.className = 'hit-card-title';
+            hitCardTitle.textContent = track.title || 'Unknown Track';
+
+            // Tạo p hit-card-artist
+            const hitCardArtist = document.createElement('p');
+            hitCardArtist.className = 'hit-card-artist';
+            hitCardArtist.textContent = track.artist_name || 'Unknown Artist';
+
+            // Gắn title và artist vào hit-card-info
+            hitCardInfo.appendChild(hitCardTitle);
+            hitCardInfo.appendChild(hitCardArtist);
+
+            // Gắn hit-card-cover và hit-card-info vào hit-card
+            hitItem.appendChild(hitCardCover);
+            hitItem.appendChild(hitCardInfo);
+
+            //Gắn hitItem vào biggestHitsContainer
+            biggestHitsContainer.appendChild(hitItem);
+        })
+    }
+
+    fetchBiggestHits().then(tracks => {
+        renderBiggestHits(tracks.slice(0, 6)); // Hiển thị 10 track đầu tiên
+    })
+
+    // Fetch artists
+    async function fetchPopularArtists() {
+        try {
+            const response = await httpRequest.get('artists/trending?limit=20');
+            const artists = response.artists || [];
+            if (artists.length === 0) {
+                showToast('Không có artists trending nào!', 'error');
+                return [];
+            } 
+            return artists; 
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu artists:', error.message);
+            showToast('Không thể tải Popular artists!', 'error');
+            return [];
+        }
+    }
+
+    // Render artists
+    function renderPopularArtists(artists) {
+        popularArtistsContainer.innerHTML = ''; // Xóa nội dung cũ
+
+        if(artists.length === 0){
+            popularArtistsContainer.innerHTML = '<p class="no-data">Không có dữ liệu artists!</p>';
+            return; 
+        }
+
+        artists.forEach(artist => {
+            // Tạo div artist-card
+            const artistCard = document.createElement('div');
+            artistCard.className = 'artist-card';
+
+            //Tạo div artist-cover
+            const artistCardCover = document.createElement('div');
+            artistCardCover.className = 'artist-card-cover';
+
+            // Tạo thẻ img
+            const img = document.createElement('img');
+            img.src = artist.image_url;
+            img.alt = artist.name || 'Unknown Artist';
+            artistCardCover.appendChild(img);
+
+            // Tạo button artist-play-btn
+            const playButton = document.createElement('button');
+            playButton.className = 'artist-play-btn';
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
+            artistCardCover.appendChild(playButton);
+
+            // Tạo div artist-card-info
+            const artistCardInfo = document.createElement('div');
+            artistCardInfo.className = 'artist-card-info';
+
+            // Tạo h3 artist-card-name
+            const artistCardName = document.createElement('h3');
+            artistCardName.className = 'artist-card-name';
+            artistCardName.textContent = artist.name || 'Unknown Artist';
+
+            // Tạo p artist-card-artist
+            const artistCardType = document.createElement('p');
+            artistCardType.className = 'artist-card-type';
+            artistCardType.textContent = artist.type || 'Artist';
+
+            // Gắn title và artist vào hit-card-info
+            artistCardInfo.appendChild(artistCardName);
+            artistCardInfo.appendChild(artistCardType);
+
+            // Gắn hit-card-cover và hit-card-info vào hit-card
+            artistCard.appendChild(artistCardCover);
+            artistCard.appendChild(artistCardInfo);
+
+            //Gắn hitItem vào biggestHitsContainer
+            popularArtistsContainer.appendChild(artistCard);
+        })
+    }
+
+    fetchPopularArtists().then(artists => {
+         renderPopularArtists(artists.slice(0, 6));
+    })
 });
