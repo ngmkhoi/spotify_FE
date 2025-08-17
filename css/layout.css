@@ -236,3 +236,9 @@
     background: var(--bg-hover);
     background-clip: content-box;
 }
+
+.hidden {
+    display: none;
+}
+
+

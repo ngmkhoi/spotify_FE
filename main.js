@@ -339,16 +339,61 @@ document.addEventListener("DOMContentLoaded", function () {
     updateHeader();
 });
 
-// Other functionality
+// Fetch artists & songs functions
 document.addEventListener("DOMContentLoaded", async function () {
+    // Hàm showToast
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px; padding: 12px 24px;
+            background: ${type === 'success' ? '#1db954' : '#f87171'};
+            color: white; border-radius: 8px; z-index: 100;
+            opacity: 0; transition: opacity 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '1';
+        }, 100);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Hàm kiểm tra trạng thái verified
+    function checkVerified(isVerified) {
+        if (isVerified) {
+            return `<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified Artist</span>`;
+        }
+        return '';
+    }
+
+    let currentView = 'home'; // Biến để theo dõi view hiện tại
 
     // Get DOM elements
     const biggestHitsContainer = document.querySelector(".hits-grid");
     const popularArtistsContainer = document.querySelector(".artists-grid");
+    const homeView = document.getElementById("home-view");
+    const detailView = document.getElementById("detail-view");
+    const artistHero = document.querySelector('.artist-hero');
+    const popularTracksContainer = document.querySelector('.popular-section');
+    const homeBtn = document.querySelector('.home-btn');
+    const spotifyLogo = document.querySelector('.logo');
 
-    if(!biggestHitsContainer || !popularArtistsContainer) {
-        console.error('Không tìm thấy các phần tử cần thiết trong DOM');
-        return;
+    // Hàm toggleView để chuyển đổi giữa home và artist
+    function toggleView(targetView) {
+        if (currentView === targetView) return;
+        if (targetView === 'home') {
+            homeView.classList.remove('hidden');
+            detailView.classList.add('hidden');
+            currentView = 'home';
+        } else if (targetView === 'artist') {
+            homeView.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            currentView = 'artist';
+        }
     }
 
     // Fetch biggest hits
@@ -359,9 +404,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (tracks.length === 0) {
                 showToast('Không có tracks trending nào!', 'error');
                 return [];
-            } 
-            return tracks
-
+            }
+            return tracks;
         } catch (error) {
             console.error('Lỗi khi lấy dữ liệu trending tracks:', error.message);
             showToast('Không thể tải Today’s biggest hits!', 'error');
@@ -371,63 +415,39 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Render biggest hits
     function renderBiggestHits(tracks) {
-        biggestHitsContainer.innerHTML = ''; // Xóa nội dung cũ
-
-        if(tracks.length === 0) {
+        biggestHitsContainer.innerHTML = '';
+        if (tracks.length === 0) {
             biggestHitsContainer.innerHTML = '<p class="no-data">Không có dữ liệu tracks!</p>';
             return;
         }
-
         tracks.forEach(track => {
             const hitItem = document.createElement('div');
             hitItem.className = 'hit-card';
-
-            //Tạo div hit-card-cover
             const hitCardCover = document.createElement('div');
             hitCardCover.className = 'hit-card-cover';
-
-            // Tạo thẻ img
             const img = document.createElement('img');
             img.src = track.image_url;
             img.alt = track.title;
             hitCardCover.appendChild(img);
-
-            // Tạo button hit-play-btn
             const playButton = document.createElement('button');
             playButton.className = 'hit-play-btn';
             playButton.innerHTML = '<i class="fas fa-play"></i>';
             hitCardCover.appendChild(playButton);
-
-            // Tạo div hit-card-info
             const hitCardInfo = document.createElement('div');
             hitCardInfo.className = 'hit-card-info';
-
-            // Tạo h3 hit-card-title
             const hitCardTitle = document.createElement('h3');
             hitCardTitle.className = 'hit-card-title';
             hitCardTitle.textContent = track.title || 'Unknown Track';
-
-            // Tạo p hit-card-artist
             const hitCardArtist = document.createElement('p');
             hitCardArtist.className = 'hit-card-artist';
             hitCardArtist.textContent = track.artist_name || 'Unknown Artist';
-
-            // Gắn title và artist vào hit-card-info
             hitCardInfo.appendChild(hitCardTitle);
             hitCardInfo.appendChild(hitCardArtist);
-
-            // Gắn hit-card-cover và hit-card-info vào hit-card
             hitItem.appendChild(hitCardCover);
             hitItem.appendChild(hitCardInfo);
-
-            //Gắn hitItem vào biggestHitsContainer
             biggestHitsContainer.appendChild(hitItem);
-        })
+        });
     }
-
-    fetchBiggestHits().then(tracks => {
-        renderBiggestHits(tracks.slice(0, 6)); // Hiển thị 10 track đầu tiên
-    })
 
     // Fetch artists
     async function fetchPopularArtists() {
@@ -437,8 +457,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (artists.length === 0) {
                 showToast('Không có artists trending nào!', 'error');
                 return [];
-            } 
-            return artists; 
+            }
+            return artists;
         } catch (error) {
             console.error('Lỗi khi lấy dữ liệu artists:', error.message);
             showToast('Không thể tải Popular artists!', 'error');
@@ -448,62 +468,157 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Render artists
     function renderPopularArtists(artists) {
-        popularArtistsContainer.innerHTML = ''; // Xóa nội dung cũ
-
-        if(artists.length === 0){
+        popularArtistsContainer.innerHTML = '';
+        if (artists.length === 0) {
             popularArtistsContainer.innerHTML = '<p class="no-data">Không có dữ liệu artists!</p>';
-            return; 
+            return;
         }
-
         artists.forEach(artist => {
-            // Tạo div artist-card
             const artistCard = document.createElement('div');
             artistCard.className = 'artist-card';
-
-            //Tạo div artist-cover
+            artistCard.dataset.artistId = artist.id || 'default-artist-id';
             const artistCardCover = document.createElement('div');
             artistCardCover.className = 'artist-card-cover';
-
-            // Tạo thẻ img
             const img = document.createElement('img');
             img.src = artist.image_url;
             img.alt = artist.name || 'Unknown Artist';
             artistCardCover.appendChild(img);
-
-            // Tạo button artist-play-btn
             const playButton = document.createElement('button');
             playButton.className = 'artist-play-btn';
             playButton.innerHTML = '<i class="fas fa-play"></i>';
             artistCardCover.appendChild(playButton);
-
-            // Tạo div artist-card-info
             const artistCardInfo = document.createElement('div');
             artistCardInfo.className = 'artist-card-info';
-
-            // Tạo h3 artist-card-name
             const artistCardName = document.createElement('h3');
             artistCardName.className = 'artist-card-name';
             artistCardName.textContent = artist.name || 'Unknown Artist';
-
-            // Tạo p artist-card-artist
             const artistCardType = document.createElement('p');
             artistCardType.className = 'artist-card-type';
             artistCardType.textContent = artist.type || 'Artist';
-
-            // Gắn title và artist vào hit-card-info
             artistCardInfo.appendChild(artistCardName);
             artistCardInfo.appendChild(artistCardType);
-
-            // Gắn hit-card-cover và hit-card-info vào hit-card
             artistCard.appendChild(artistCardCover);
             artistCard.appendChild(artistCardInfo);
-
-            //Gắn hitItem vào biggestHitsContainer
             popularArtistsContainer.appendChild(artistCard);
-        })
+        });
     }
 
+    async function fetchArtistData(artistId) {
+        try {
+            // Lấy thông tin artist
+            const artistResponse = await httpRequest.get(`artists/${artistId}`);
+            const artist = artistResponse || {};
+            console.log('Artist data:', artist);
+
+            // Lấy tracks phổ biến của artist
+            const tracksResponse = await httpRequest.get(`artists/${artistId}/tracks/popular?limit=10`);
+            const tracks = tracksResponse.tracks || [];
+            console.log('Tracks data:', tracks);
+
+            if (!artist|| tracks.length === 0) {
+                showToast('Không tìm thấy dữ liệu artist hoặc tracks!', 'error');
+                return null;
+            }
+
+            // Thêm artist_name vào mỗi track
+            tracks.forEach(track => {
+                track.artist_name = artist.name; // Gán artist_name từ artist.name
+            });
+
+            return { artist, tracks };
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu artist:', error.message);
+            showToast('Không thể tải thông tin artist!', 'error');
+            return null;
+        }
+    }
+
+    function renderArtistData(artist, tracks) {
+        if (!artist || !tracks) {
+            artistHero.innerHTML = '<p class="no-data">Không có dữ liệu artist!</p>';
+            popularTracksContainer.innerHTML = '<p class="no-data">Không có dữ liệu tracks!</p>';
+            return;
+        }
+
+        artistHero.innerHTML = `
+            <div class="hero-background">
+                <img
+                    src="${artist.background_image_url || './default-artist.jpg'}"
+                    alt="${artist.name || 'Unknown Artist'}"
+                    class="hero-image"
+                />
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="artist-name">${artist.name || 'Unknown Artist'}</h1>
+                    ${checkVerified(artist.is_verified)}
+                    <p class="monthly-listeners">${artist.monthly_listeners?.toLocaleString() || 0} monthly listeners</p>
+            </div>
+        `;
+
+        popularTracksContainer.innerHTML = '';
+        tracks.forEach((track, index) => {
+            const trackItem = document.createElement('div');
+            trackItem.className = 'track-item';
+            // Chuyển đổi duration từ giây sang định dạng mm:ss
+            const minutes = Math.floor(track.duration / 60);
+            const seconds = track.duration % 60;
+            const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            trackItem.innerHTML = `
+                <span class="track-number">${index + 1}</span>
+                <div class="track-image">
+                    <img src="${track.image_url || './default-track.jpg'}" alt="${track.title || 'Unknown Track'}">
+                </div>
+                <div class="track-info">
+                    <h3 class="track-name">${track.title || 'Unknown Track'}</h3>
+                    <p class="track-artist">${track.artist_name || 'Unknown Artist'}</p>
+                </div>
+                <span class="track-plays">${track.play_count?.toLocaleString() || 0}</span>
+                <span class="track-duration">${formattedDuration || '0:00'}</span>
+            `;
+            popularTracksContainer.appendChild(trackItem);
+        });
+    }
+
+    function setupArtistClickEvents() {
+        const artistCards = document.querySelectorAll('.artist-card');
+        console.log('Setting up artist click events:', artistCards);
+        artistCards.forEach(card => {
+            const artistId = card.dataset.artistId || 'default-artist-id';
+            card.addEventListener('click', async () => {
+                console.log('Clicked artist, toggling to artist view:', artistId);
+                toggleView('artist');
+                const data = await fetchArtistData(artistId);
+                if (data) {
+                    renderArtistData(data.artist, data.tracks);
+                }
+            });
+        });
+    }
+
+    function setupHomeClickEvents() {
+        if(homeBtn){
+            homeBtn.addEventListener('click', () => {
+                toggleView('home');
+            });
+        }
+
+        if(spotifyLogo){
+            spotifyLogo.addEventListener('click', () => {
+                toggleView('home');
+            });
+        }
+    }
+
+    fetchBiggestHits().then(tracks => {
+        renderBiggestHits(tracks.slice(0, 6));
+    });
+
     fetchPopularArtists().then(artists => {
-         renderPopularArtists(artists.slice(0, 6));
-    })
+        renderPopularArtists(artists.slice(0, 6));
+        setupArtistClickEvents();
+    });
+
+    toggleView('home');
+    setupHomeClickEvents();
 });
