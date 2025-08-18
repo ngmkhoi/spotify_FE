@@ -17,20 +17,37 @@ class HttpRequest {
                 _options.body = JSON.stringify(data);
             }
             const res = await fetch(`${this.baseUrl}${path}`, _options);
-            const response = await res.json();
 
+            // Xử lý response rỗng (status 204)
+            if (res.status === 204) {
+                return {};
+            }
+
+            // Kiểm tra Content-Type của response
+            const contentType = res.headers.get('Content-Type') || '';
             if (!res.ok) {
                 const error = new Error(`HTTP error! status: ${res.status} ${res.statusText}`);
-                error.response = response; // Attach the response to the error
+                error.response = contentType.includes('text/plain')
+                    ? { message: await res.text() }
+                    : await res.json().catch(() => ({}));
                 error.status = res.status;
                 throw error;
             }
+
+            // Xử lý response dựa trên Content-Type
+            if (contentType.includes('text/plain')) {
+                const text = await res.text();
+                return { message: text };
+            }
+
+            const response = await res.json().catch(() => ({}));
             return response;
         } catch (error) {
             console.log('Error in HTTP request:', error);
-            throw error; // Ném lỗi để xử lý ở nơi gọi
+            throw error;
         }
     }
+
 
     async get(path, options = {}) {
         return await this._send(path, 'GET', null, options);

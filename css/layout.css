@@ -241,4 +241,51 @@
     display: none;
 }
 
+/* Container chứa số thứ tự và nút play, đặt nó vào đúng cột đầu tiên của grid */
+.track-position {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* width: 16px;  Không cần width vì grid đã định nghĩa kích thước cột */
+    /* color: var(--text-secondary); Không cần vì .track-number đã có */
+}
+
+/* Ẩn nút play mặc định */
+.track-item .track-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none; /* Ngăn không cho click khi đang ẩn */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px; /* Chỉnh kích thước icon cho phù hợp */
+    transition: opacity var(--transition-fast);
+    padding: 0;
+}
+
+/* Hiển thị số thứ tự mặc định */
+.track-item .track-number {
+    opacity: 1;
+    transition: opacity var(--transition-fast);
+}
+
+/* KHI HOVER VÀO CẢ DÒNG (.track-item) */
+
+.track-item:hover .track-number {
+    opacity: 0; /* Ẩn số thứ tự đi */
+}
+
+.track-item:hover .track-play-btn {
+    opacity: 1; /* Hiện nút play lên */
+    pointer-events: auto; /* Cho phép click khi hiện ra */
+}
+
+#audio-player {
+    display: none;
+}
 
