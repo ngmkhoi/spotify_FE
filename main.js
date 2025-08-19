@@ -33,6 +33,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const audio = document.getElementById('audio-player');
     const playBtn = document.querySelector('.control-btn.play-btn');
+    const player = document.querySelector('.player');
+    const playerTitle = document.querySelector('.player-title');
+    const playerArtist = document.querySelector('.player-artist');
+    const playerImage = document.querySelector('.player-image');
+    const progressContainer = document.querySelector('.progress-container');
+    const progressBar = document.querySelector('.progress-bar');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressHandle = document.querySelector('.progress-handle');
+    const currentTimeEl = document.querySelector('.time:first-child');
+    const totalTimeEl = document.querySelector('.time:last-child');
+    const controlButtons = document.querySelectorAll('.player-controls .control-btn');
 
     // Function to sanitize input
     function sanitizeInput(input) {
@@ -329,13 +340,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    function initNoTrack() {
+        playerTitle.textContent = 'Chưa có bài hát được chọn';
+        playerArtist.textContent = '';
+        playerImage.style.display = 'none';
+        progressContainer.style.opacity = '0.5';
+        progressContainer.style.pointerEvents = 'none';
+        controlButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        });
+        player.classList.add('no-track');
+        audio.src = '';
+        progressFill.style.width = '0%';
+        progressHandle.style.left = '0%';
+        currentTimeEl.textContent = '0:00';
+        totalTimeEl.textContent = '0:00';
+    }
+
     //Logout Button Functionality
     const logoutBtn = document.getElementById("logoutBtn");
     logoutBtn?.addEventListener("click", async function () {
         userDropdown.classList.remove("show");
         localStorage.clear();
+        const audio = document.getElementById('audio-player');
         audio.pause();
-        playBtn.innerHTML = '<i class="fas fa-play"></i>'; 
+        audio.src = ''; // Reset nguồn audio
+        initNoTrack(); // Reset UI về trạng thái No Track
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
         await updateHeader();
         showToast('Đăng xuất thành công!', 'success');
     });
@@ -714,7 +746,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     //Cập nhật progressBar
     function updateProgressBar() {
-         const audio = document.getElementById('audio-player');
+        const audio = document.getElementById('audio-player');
         if (!audio.src || audio.src === '') {
             return;
         }
