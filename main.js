@@ -677,10 +677,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     const repeatBtn = player.querySelector('.control-btn:has(.fa-redo)');
     const volumeBar = player.querySelector('.volume-bar');
     const progressBar = player.querySelector('.progress-bar');
+    const progressFill = player.querySelector('.progress-fill');
+    const progressHandle = player.querySelector('.progress-handle');
+    const currentTimeEl = document.querySelector('.time:first-child');
+    const totalTimeEl = document.querySelector('.time:last-child')
     const playerTitle = player.querySelector('.player-title');
     const playerArtist = player.querySelector('.player-artist');
     const playerImage = player.querySelector('.player-image');
+    const audio = document.getElementById('audio-player');
+    const controlButtons = document.querySelectorAll('.player-controls .control-btn');
+    const progressContainer = document.querySelector('.progress-container');
 
+    initNoTrack();
+
+    // Hàm cập nhật UI cho player
     function updatePlayerUI() {
         const audio = document.getElementById('audio-player');
         if (audio.src) {
@@ -689,6 +699,73 @@ document.addEventListener("DOMContentLoaded", async function () {
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
         }
     }
+
+    function formatTime(seconds){
+        if(isNaN(seconds)) return '0:00'
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    //Cập nhật total time
+    audio.addEventListener('loadedmetadata', () => {
+        totalTimeEl.textContent = formatTime(audio.duration);
+    })
+
+    //Cập nhật progressBar
+    function updateProgressBar() {
+         const audio = document.getElementById('audio-player');
+        if (!audio.src || audio.src === '') {
+            return;
+        }
+        if (audio.duration > 0) {
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            progressHandle.style.left = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        }
+    }
+
+    //Xử lý click để tua
+    progressBar.addEventListener('click', (event) => {
+        const audio = document.getElementById('audio-player');
+        const rect = progressBar.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const width = rect.width;
+        const newTime = (offsetX / width) * audio.duration;
+        audio.currentTime = newTime;
+        updateProgressBar();
+    })
+
+    //Mặc định chưa kéo
+    let isDragging = false;
+
+    //Khi đè chuột thì mới đang kéo
+    progressHandle.addEventListener('mousedown', () => {
+        isDragging = true;
+    })
+
+    document.addEventListener('mousemove', (event) => {
+        if(isDragging){
+            const audio = document.getElementById('audio-player');
+            const rect = progressBar.getBoundingClientRect();
+            let offsetX = event.clientX - rect.left;
+            // Giới hạn offsetX trong [0, width]
+            offsetX = Math.max(0, Math.min(offsetX, rect.width));
+            const newTime = (offsetX / rect.width) * audio.duration;
+            audio.currentTime = newTime;
+            // Cập nhật UI ngay lập tức
+            const progressPercent = (offsetX / rect.width) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            progressHandle.style.left = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(newTime);
+        }
+    })
+
+    //Ngưng đè thì dừng tua
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    })
 
     async function handlePlayPause() {
         const access_token = checkAuth();
@@ -731,6 +808,16 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log('Response từ POST /tracks/:trackId/play:', response); // Debug
             const track = response.track || {};
             if (track.id && track.audio_url) {
+                // Xóa trạng thái No Track
+                player.classList.remove('no-track');
+                playerImage.style.display = 'block';
+                progressContainer.style.opacity = '1';
+                progressContainer.style.pointerEvents = 'auto';
+                controlButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
+
                 // Cập nhật bottom player
                 playerTitle.textContent = track.title || 'Unknown Track';
                 playerArtist.textContent = track.artist_name || 'Unknown Artist';
@@ -803,8 +890,25 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error('Không tìm thấy playBtn để gắn sự kiện!');
     }
 
-    //Polling để cập nhật UI mỗi 5s
-    //setInterval(updatePlayerUI, 5000);
+     //Hàm set trạng thái no track
+    function initNoTrack() {
+        playerTitle.textContent = 'Chưa có bài hát được chọn'
+        playerArtist.textContent = ''
+        playerImage.style.display = 'none'
+        progressContainer.style.opacity = '0.5';
+        progressContainer.style.pointerEvents = 'none';
+        controlButtons.forEach(button => {
+            button.disabled = true;
+            button.style.opacity = '0.5';
+        })
+        player.classList.add('no-track');
+        const audio = document.getElementById('audio-player');
+        audio.src = '';
+        progressFill.style.width = '0%';
+        progressHandle.style.left = '0%';
+        currentTimeEl.textContent = '0:00';
+        totalTimeEl.textContent = '0:00';
+    }
 
     fetchBiggestHits().then(tracks => {
         renderBiggestHits(tracks.slice(0, 10));
@@ -815,6 +919,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         renderPopularArtists(artists.slice(0, 10));
         setupArtistClickEvents();
     });
-        
+
+    //Luôn luôn cập nhật
+    audio.addEventListener('timeupdate', updateProgressBar);    
 });
 

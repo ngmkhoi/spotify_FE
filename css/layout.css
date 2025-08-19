@@ -247,8 +247,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* width: 16px;  Không cần width vì grid đã định nghĩa kích thước cột */
-    /* color: var(--text-secondary); Không cần vì .track-number đã có */
 }
 
 /* Ẩn nút play mặc định */
@@ -288,4 +286,5 @@
 #audio-player {
     display: none;
 }
+
 
