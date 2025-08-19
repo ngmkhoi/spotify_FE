@@ -31,6 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const loginEmailFormGroup = loginEmailInput?.closest('.form-group');
     const loginPasswordFormGroup = loginPasswordInput?.closest('.form-group');
 
+    const audio = document.getElementById('audio-player');
+    const playBtn = document.querySelector('.control-btn.play-btn');
+
     // Function to sanitize input
     function sanitizeInput(input) {
     return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -331,6 +334,8 @@ document.addEventListener("DOMContentLoaded", function () {
     logoutBtn?.addEventListener("click", async function () {
         userDropdown.classList.remove("show");
         localStorage.clear();
+        audio.pause();
+        playBtn.innerHTML = '<i class="fas fa-play"></i>'; 
         await updateHeader();
         showToast('Đăng xuất thành công!', 'success');
     });
@@ -339,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateHeader();
 });
 
-// Artists & Songs Functionality
+    // Artists & Songs Functionality
 document.addEventListener("DOMContentLoaded", async function () {
     // Hàm showToast
     function showToast(message, type = 'success') {
@@ -382,6 +387,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     let currentView = 'home'; // Biến để theo dõi view hiện tại
+    let currentTracks = []; // Biến để lưu trữ tracks hiện tại
 
     // Get DOM elements
     const biggestHitsContainer = document.querySelector(".hits-grid");
@@ -552,6 +558,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+        currentTracks = tracks;
+
         artistHero.innerHTML = `
             <div class="hero-background">
                 <img
@@ -568,6 +576,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             </div>
         `;
         artistHero.dataset.artistId = artist.id || '';
+        artistHero.dataset.firstTrackId = tracks[0]?.id || ''; //set ID track đầu tiên
 
         const artistControls = document.querySelector('.artist-controls');
         artistControls.innerHTML = `
@@ -607,6 +616,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             popularTracksContainer.appendChild(trackItem);
         });
         setupTrackPlayEvents(); // Gắn sự kiện sau khi render
+    }
+
+    async function addToQueue(trackId) {
+        const access_token = checkAuth();
+        if (!access_token) return;
+
+        try {
+            await httpRequest.post(`me/player/queue`, {
+                track_id: trackId
+            }, {
+                headers: { Authorization: `Bearer ${access_token}` }
+            })
+        } catch (error) {
+            console.error('Lỗi khi thêm vào queue:', error.message);
+            showToast('Không thể thêm vào queue!', 'error');
+        }
     }
 
     function setupArtistClickEvents() {
@@ -728,6 +753,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     function setupTrackPlayEvents() {
         const hitPlayButtons = document.querySelectorAll('.hit-play-btn');
         const trackPlayButtons = document.querySelectorAll('.track-play-btn');
+         const artistPlayBtn = document.querySelector('.play-btn-large');
 
         hitPlayButtons.forEach(button => {
             const hitCard = button.closest('.hit-card');
@@ -744,6 +770,28 @@ document.addEventListener("DOMContentLoaded", async function () {
                 handlePlayTrack(trackId);
             });
         });
+
+        artistPlayBtn.addEventListener('click', async () => {
+            const access_token = checkAuth();
+            if (!access_token) return;
+
+            if (currentTracks.length === 0) {
+                showToast('Không có tracks để phát!', 'error');
+                return;
+            }
+
+            // Phát track đầu tiên
+            const firstTrackId = currentTracks[0].id;
+            await handlePlayTrack(firstTrackId);
+
+            // Thêm các tracks còn lại vào queue
+            const remainingTracks = currentTracks.slice(1);
+            for (const track of remainingTracks) {
+                await addToQueue(track.id);
+            }
+
+            showToast('Đang phát playlist của artist!', 'success');
+        });
     }
 
     // Gọi updatePlayerUI ban đầu
@@ -756,15 +804,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     //Polling để cập nhật UI mỗi 5s
-    setInterval(updatePlayerUI, 5000);
+    //setInterval(updatePlayerUI, 5000);
 
     fetchBiggestHits().then(tracks => {
-        renderBiggestHits(tracks.slice(0, 6));
+        renderBiggestHits(tracks.slice(0, 10));
         setupTrackPlayEvents(); // Gắn sự kiện sau khi render
     });
 
     fetchPopularArtists().then(artists => {
-        renderPopularArtists(artists.slice(0, 6));
+        renderPopularArtists(artists.slice(0, 10));
         setupArtistClickEvents();
     });
         
