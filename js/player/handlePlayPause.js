@@ -1,4 +1,4 @@
-import checkAuth from "../auth/checkAuth.js";
+import checkAuth from "../middlewares/checkAuth.js";
 import showToast from "../utils/showToast.js";
 
 async function handlePlayPause() {

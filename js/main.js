@@ -1,8 +1,8 @@
-import httpRequest from "./utils/httpRequest.js";
+import httpRequest from "./services/httpRequest.js";
 import { validateField } from './middlewares/validation.js';
-import updateHeader from "./auth/updateHeader.js";
-import showSignupForm from "./auth/showSignupForm.js";
-import showLoginForm from "./auth/showLoginForm.js";
+import updateHeader from "./authForm/updateHeader.js";
+import showSignupForm from "./authForm/showSignupForm.js";
+import showLoginForm from "./authForm/showLoginForm.js";
 import openModal from "./modal/openModal.js";
 import closeModal from "./modal/closeModal.js";
 import clearForm from "./modal/clearForm.js";

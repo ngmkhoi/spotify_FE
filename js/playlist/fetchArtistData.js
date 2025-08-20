@@ -1,4 +1,4 @@
-import httpRequest from "../utils/httpRequest.js";
+import httpRequest from "../services/httpRequest.js";
 import showToast from "../utils/showToast.js";
 
 async function fetchArtistData(artistId) {

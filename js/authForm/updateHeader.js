@@ -1,4 +1,4 @@
-import httpRequest from "../utils/httpRequest.js";
+import httpRequest from "../services/httpRequest.js";
 import sanitizeInput from "../utils/sanitizeInput.js";
 
 async function updateHeader() {

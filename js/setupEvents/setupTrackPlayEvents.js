@@ -1,4 +1,4 @@
-import  checkAuth  from "../auth/checkAuth.js";
+import  checkAuth  from "../middlewares/checkAuth.js";
 import  handlePlayTrack  from "../player/handlePlayTrack.js";
 import  addToQueue  from "../queue/addToQueue.js";
 import  showToast  from "../utils/showToast.js";

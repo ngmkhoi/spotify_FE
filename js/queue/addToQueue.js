@@ -1,5 +1,5 @@
-import httpRequest from "../utils/httpRequest.js";
-import checkAuth from "../auth/checkAuth.js";
+import httpRequest from "../services/httpRequest.js";
+import checkAuth from "../middlewares/checkAuth.js";
 import showToast from "../utils/showToast.js";
 
 async function addToQueue(trackId) {
