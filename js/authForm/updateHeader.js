@@ -1,4 +1,6 @@
 import httpRequest from "../services/httpRequest.js";
+import fetchSidebarItems from "../sidebar/fetchSidebarItems.js";
+import { renderLibrary } from "../sidebar/renderLibrary.js";
 import sanitizeInput from "../utils/sanitizeInput.js";
 
 async function updateHeader() {

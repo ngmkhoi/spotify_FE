@@ -19,7 +19,11 @@ import renderPopularArtists from "./home/renderPopularArtists.js";
 import setupArtistClickEvents from "./setupEvents/setupArtistClickEvents.js";
 import setupHomeClickEvents from "./setupEvents/setupHomeClickEvents.js";
 import setupTrackPlayEvents from "./setupEvents/setupTrackPlayEvents.js";
-import toggleView from "./utils/toggleView.js";
+import fetchSidebarItems from "./sidebar/fetchSidebarItems.js";
+import { renderLibrary, setupLibraryTabs } from "./sidebar/renderLibrary.js";
+//import setupFollowButton from "./setupClickEvents/setupFollowArtistEvents.js";
+
+
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -53,10 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const progressHandle = document.querySelector('.progress-handle');
     const currentTimeEl = document.querySelector('.time:first-child');
     const totalTimeEl = document.querySelector('.time:last-child');
-    const homeBtn = document.querySelector('.home-btn');
-    const spotifyLogo = document.querySelector('.logo');
-
-
+    const libraryContent = document.querySelector('.library-content');
 
     // Auth Modal Event Listeners
     signupBtn?.addEventListener("click", () => {
@@ -169,6 +170,11 @@ document.addEventListener("DOMContentLoaded", function () {
             clearForm(loginFormElement);
             showToast('Đăng nhập thành công!', 'success');
             closeModal();
+
+            fetchSidebarItems().then(() => {
+                setupLibraryTabs();
+                renderLibrary();
+            });
         } catch (error) {
             const errorMessage = error.response?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
             if (errorMessage.toLowerCase().includes('email')) {
@@ -212,6 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
         audio.src = '';
         initNoTrack();
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        libraryContent.innerHTML = '';
         await updateHeader();
         showToast('Đăng xuất thành công!', 'success');
     });
@@ -264,6 +271,10 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchBiggestHits().then(tracks => {
         renderBiggestHits(tracks.slice(0, 10));
         setupTrackPlayEvents();
+    });
+    fetchSidebarItems().then(() => {
+        setupLibraryTabs();
+        renderLibrary();
     });
     fetchPopularArtists().then(artists => {
         renderPopularArtists(artists.slice(0, 10));

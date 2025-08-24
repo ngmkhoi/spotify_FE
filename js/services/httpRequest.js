@@ -53,7 +53,7 @@ class HttpRequest {
         return await this._send(path, 'GET', null, options);
     }
 
-    async post(path, data, options = {}) {
+    async post(path, data = {}, options = {}) {
         return await this._send(path, 'POST', data, options);
     }
 
@@ -65,7 +65,7 @@ class HttpRequest {
         return await this._send(path, 'PATCH', data, options);
     }
 
-    async del(path, options = {}) {
+    async delete(path, options = {}) {
         return await this._send(path, 'DELETE', null, options);
     }
 }

@@ -1,6 +1,7 @@
 import checkVerified from "./checkVerified.js";
 import setupTrackPlayEvents from "../setupEvents/setupTrackPlayEvents.js";
 import {setCurrentTracks} from "../queue/trackState.js";
+import { setupFollowButton } from "./toggleFollowArtists.js";
 
 function renderArtistData(artist, tracks) {
     const artistHero = document.querySelector('.artist-hero');
@@ -13,7 +14,6 @@ function renderArtistData(artist, tracks) {
     }
 
     setCurrentTracks(tracks); // Set currentTracks in shared module
-
     artistHero.innerHTML = `
         <div class="hero-background">
             <img
@@ -37,6 +37,7 @@ function renderArtistData(artist, tracks) {
         <button class="play-btn-large">
             <i class="fas fa-play"></i>
         </button>
+        <button class="follow-btn" data-artist-id="${artist.id || ''}">Follow</button>
     `;
 
     popularTracksContainer.innerHTML = '';
@@ -70,6 +71,7 @@ function renderArtistData(artist, tracks) {
         popularTracksContainer.appendChild(trackItem);
     });
     setupTrackPlayEvents();
+    setupFollowButton(artist.id);
 }
 
 export default renderArtistData;

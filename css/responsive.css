@@ -314,6 +314,14 @@
     }
 }
 
+/* Mobile */
+@media (max-width: 767px) {
+    .follow-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 12px;
+    }
+}
+
 /* High DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .hero-image {

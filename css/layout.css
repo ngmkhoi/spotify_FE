@@ -287,4 +287,10 @@
     display: none;
 }
 
-
+.playlist-name {
+    font-size: 48px;
+}
+.playlist-owner, .track-count {
+    font-size: 14px;
+    color: var(--text-secondary);
+}

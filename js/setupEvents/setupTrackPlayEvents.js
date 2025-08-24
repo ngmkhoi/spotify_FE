@@ -3,6 +3,8 @@ import  handlePlayTrack  from "../player/handlePlayTrack.js";
 import  addToQueue  from "../queue/addToQueue.js";
 import  showToast  from "../utils/showToast.js";
 import  {getCurrentTracks}  from "../queue/trackState.js";
+import  getTrackId  from "../utils/getTrackId.js";
+
 
 function setupTrackPlayEvents() {
     const hitPlayButtons = document.querySelectorAll('.hit-play-btn');
@@ -35,15 +37,23 @@ function setupTrackPlayEvents() {
             return;
         }
 
-        const firstTrackId = currentTracks[0].id;
+        const firstTrack = currentTracks[0];
+        const firstTrackId = getTrackId(firstTrack);
+        if (!firstTrackId) {
+            showToast('Track đầu tiên không hợp lệ!', 'error');
+            return;
+        }
         await handlePlayTrack(firstTrackId);
 
         const remainingTracks = currentTracks.slice(1);
         for (const track of remainingTracks) {
-            await addToQueue(track.id);
+            const trackId = getTrackId(track);
+            if (!trackId) {
+                console.error('Bỏ qua track không có ID:', track);
+                continue;
+            }
+            await addToQueue(trackId);
         }
-
-        showToast('Đang phát playlist của artist!', 'success');
     });
 }
 

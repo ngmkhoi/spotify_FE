@@ -1,6 +1,6 @@
 import toggleView from "../utils/toggleView.js";
-import fetchArtistData from "../playlist/fetchArtistData.js";
-import renderArtistData from "../playlist/renderArtistData.js";
+import fetchArtistData from "../artist/fetchArtistData.js";
+import renderArtistData from "../artist/renderArtistData.js";
 
 function setupArtistClickEvents() {
     const artistCards = document.querySelectorAll('.artist-card');
