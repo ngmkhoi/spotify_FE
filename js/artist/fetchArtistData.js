@@ -6,11 +6,11 @@ async function fetchArtistData(artistId) {
     try {
         const artistResponse = await httpRequest.get(`artists/${artistId}`);
         const artist = artistResponse || {};
-        console.log('Artist data:', artist);
+        //console.log('Artist data:', artist);
 
         const tracksResponse = await httpRequest.get(`artists/${artistId}/tracks/popular?limit=10`);
         const tracks = tracksResponse.tracks || [];
-        console.log('Tracks data:', tracks);
+        //console.log('Tracks data:', tracks);
 
         tracks.forEach(track => {
             track.artist_name = artist.name;

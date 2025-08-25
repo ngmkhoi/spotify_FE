@@ -28,7 +28,6 @@ function renderPlaylistData(playlist, tracks) {
     playlistHero.dataset.playlistId = playlist.id || '';
 
     const controls = document.querySelector('.artist-controls');
-    // Chỉ render follow button nếu is_owned = false
     const followButtonHTML = playlist.is_owner
         ? ''
         : `<button class="follow-btn" data-playlist-id="${playlist.id || ''}">${playlist.is_following ? 'Unfollow' : 'Follow'}</button>`;
@@ -45,7 +44,6 @@ function renderPlaylistData(playlist, tracks) {
         ${deleteButtonHTML}
     `;
 
-     // Gắn event listener cho playlist-name và hero-overlay nếu là owner
     if (playlist.is_owner) {
         const playlistName = playlistHero.querySelector('.playlist-name');
         const heroOverlay = playlistHero.querySelector('.hero-overlay');
@@ -87,8 +85,9 @@ function renderPlaylistData(playlist, tracks) {
         `;
         popularTracksContainer.appendChild(trackItem);
     });
-    setupTrackMenuEvents();
+
     setupTrackPlayEvents();
+    setupTrackMenuEvents();
     if (!playlist.is_owner) {
         console.log('DEBUG: Setting up follow button for playlist:', playlist.id);
         setupFollowButton(playlist.id);

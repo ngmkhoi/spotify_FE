@@ -69,8 +69,8 @@ function renderArtistData(artist, tracks) {
         `;
         popularTracksContainer.appendChild(trackItem);
     });
-    setupTrackMenuEvents();
     setupTrackPlayEvents();
+    setupTrackMenuEvents();
     setupFollowButton(artist.id);
 }
 

@@ -6,6 +6,7 @@ import { showRemoveTrackConfirmModal } from "../playlist/removeTrackFromPlaylist
 
 
 function setupTrackMenuEvents() {
+    getUserPlaylists()
     const menuButtons = document.querySelectorAll('.track-menu-btn');
     menuButtons.forEach(button => {
         button.addEventListener('click', async (e) => {
@@ -14,10 +15,12 @@ function setupTrackMenuEvents() {
             const trackTitle = trackItem.querySelector('.track-name').textContent;
             const playlistId = document.querySelector('.artist-hero').dataset.playlistId;
 
-            if (!trackId || !playlistId) {
-                showToast('Không tìm thấy track hoặc playlist!', 'error');
-                return;
-            }
+            // console.log(playlistId);
+            
+            // if(!playlistId){
+            //     showToast('Không tìm thấy playlist!', 'error');
+            //     return;
+            // }
 
             // Lấy thông tin playlist để kiểm tra is_owner
             const { playlist } = await fetchPlaylistData(playlistId);

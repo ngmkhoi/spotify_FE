@@ -14,10 +14,8 @@ async function addTrackToPlaylist(trackId, playlistId) {
             headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' }
         });
         showToast('Đã thêm track vào playlist!', 'success');
-        // Optional: await fetchSidebarItems(); renderLibrary('playlists'); // Nếu cần refresh sidebar
     } catch (error) {
         console.error('Lỗi khi thêm track:', error);
-        showToast('Không thể thêm track! Vui lòng thử lại.', 'error');
         if (error.status === 401) {
             showToast('Phiên đăng nhập hết hạn! Vui lòng đăng nhập lại.', 'error');
         } else if (error.status === 409) {

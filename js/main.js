@@ -23,12 +23,13 @@ import fetchSidebarItems from "./sidebar/fetchSidebarItems.js";
 import { renderLibrary, setupLibraryTabs } from "./sidebar/renderLibrary.js";
 import createPlaylist from "./playlist/createPlaylist.js";
 import setupPlayerAddEvent from "./setupEvents/setupPlayerAddEvents.js";
+import getUserPlaylists from "./playlist/getUserPlaylist.js";
 //import setupFollowButton from "./setupClickEvents/setupFollowArtistEvents.js";
 
 
 
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     // Get DOM elements
     const signupBtn = document.querySelector(".signup-btn");
     const loginBtn = document.querySelector(".login-btn");
@@ -86,6 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
             closeModal();
         }
     });
+
+    libraryContent.innerHTML = ''
 
     showLoginBtn?.addEventListener("click", showLoginForm);
     showSignupBtn?.addEventListener("click", showSignupForm);
