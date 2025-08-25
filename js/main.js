@@ -22,6 +22,7 @@ import setupTrackPlayEvents from "./setupEvents/setupTrackPlayEvents.js";
 import fetchSidebarItems from "./sidebar/fetchSidebarItems.js";
 import { renderLibrary, setupLibraryTabs } from "./sidebar/renderLibrary.js";
 import createPlaylist from "./playlist/createPlaylist.js";
+import setupPlayerAddEvent from "./setupEvents/setupPlayerAddEvents.js";
 //import setupFollowButton from "./setupClickEvents/setupFollowArtistEvents.js";
 
 
@@ -283,5 +284,6 @@ document.addEventListener("DOMContentLoaded", function () {
         renderPopularArtists(artists.slice(0, 10));
         setupArtistClickEvents();
     });
+    setupPlayerAddEvent();
     audio.addEventListener('timeupdate', updateProgressBar);
 });

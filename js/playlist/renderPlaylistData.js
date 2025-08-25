@@ -4,7 +4,7 @@ import { setupFollowButton } from "./toggleFollowPlaylist.js";
 import { setCurrentTracks } from "../queue/trackState.js";
 import showEditForm from "./showEditForm.js";
 import {showDeleteConfirmModal} from "./deletePlaylist.js";
-
+import setupTrackMenuEvents from "../setupEvents/setupTrackMenuEvents.js";
 
 const BASE_URL = 'http://spotify.f8team.dev';
 
@@ -87,6 +87,7 @@ function renderPlaylistData(playlist, tracks) {
         `;
         popularTracksContainer.appendChild(trackItem);
     });
+    setupTrackMenuEvents();
     setupTrackPlayEvents();
     if (!playlist.is_owner) {
         console.log('DEBUG: Setting up follow button for playlist:', playlist.id);

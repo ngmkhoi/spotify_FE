@@ -8,6 +8,7 @@ async function handlePlayTrack(trackId) {
 
     const audio = document.getElementById('audio-player');
     const player = document.querySelector('.player');
+    const playerLeft = document.querySelector('.player-left');
     const playerImage = document.querySelector('.player-image');
     const progressContainer = document.querySelector('.progress-container');
     const controlButtons = document.querySelectorAll('.player-controls .control-btn');
@@ -29,6 +30,7 @@ async function handlePlayTrack(trackId) {
                 btn.style.opacity = '1';
             });
 
+            playerLeft.dataset.trackId = track.id;
             playerTitle.textContent = track.title || 'Unknown Track';
             playerArtist.textContent = track.artist_name || 'Unknown Artist';
             playerImage.src = track.image_url || './default-track.jpg';

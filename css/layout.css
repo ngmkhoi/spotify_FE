@@ -475,3 +475,152 @@
 .delete-playlist-modal .cancel-btn:hover {
     background: var(--bg-hover);
 }
+
+.add-to-playlist-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+}
+
+.add-to-playlist-modal .modal-content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    max-width: 400px;
+    width: 90%;
+}
+
+.add-to-playlist-modal h2 {
+    font-size: 20px;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.add-to-playlist-modal .playlist-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: var(--spacing-md);
+}
+
+.add-to-playlist-modal li {
+    margin-bottom: var(--spacing-sm);
+}
+
+.add-to-playlist-modal button {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    text-align: left;
+}
+
+.add-to-playlist-modal button:hover {
+    background: var(--bg-hover);
+}
+
+.add-to-playlist-modal .cancel-btn {
+    background: var(--accent-primary);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.add-to-playlist-modal .cancel-btn:hover {
+    background: var(--accent-hover);
+}
+
+.track-menu {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    box-shadow: 0 2px 8px var(--shadow);
+    z-index: var(--z-modal);
+}
+
+.track-menu ul {
+    list-style: none;
+}
+
+.track-menu li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.track-menu button {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: none;
+    color: var(--text-primary);
+    text-align: left;
+    border-radius: var(--radius-sm);
+}
+
+.track-menu button:hover {
+    background: var(--bg-hover);
+}
+
+.remove-track-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+}
+
+.remove-track-modal .modal-content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    max-width: 400px;
+    width: 90%;
+}
+
+.remove-track-modal h2 {
+    font-size: 20px;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.remove-track-modal p {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-secondary);
+}
+
+.remove-track-modal .form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+}
+
+.remove-track-modal .confirm-remove-btn {
+    background: var(--accent-primary);
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+}
+
+.remove-track-modal .confirm-remove-btn:hover {
+    background: var(--accent-hover);
+}
+
+.remove-track-modal .cancel-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+}
+
+.remove-track-modal .cancel-btn:hover {
+    background: var(--bg-hover);
+}

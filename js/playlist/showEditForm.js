@@ -72,12 +72,6 @@ async function showEditForm(playlist) {
                 return;
             }
 
-            // console.log('DEBUG: Submitting update for playlist:', playlist.id);
-            // console.log('DEBUG: New data:', { name: newName, description: newDesc, hasImage: !!newImage });
-            // if (newImage) {
-            //     console.log('DEBUG: File selected:', newImage.name, newImage.size, newImage.type);
-            // }
-
             let imageUrl = playlist.image_url;
             if (newImage) {
                 const formData = new FormData();

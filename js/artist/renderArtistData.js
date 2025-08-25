@@ -2,6 +2,7 @@ import checkVerified from "./checkVerified.js";
 import setupTrackPlayEvents from "../setupEvents/setupTrackPlayEvents.js";
 import {setCurrentTracks} from "../queue/trackState.js";
 import { setupFollowButton } from "./toggleFollowArtists.js";
+import setupTrackMenuEvents from "../setupEvents/setupTrackMenuEvents.js";
 
 function renderArtistData(artist, tracks) {
     const artistHero = document.querySelector('.artist-hero');
@@ -68,6 +69,7 @@ function renderArtistData(artist, tracks) {
         `;
         popularTracksContainer.appendChild(trackItem);
     });
+    setupTrackMenuEvents();
     setupTrackPlayEvents();
     setupFollowButton(artist.id);
 }
