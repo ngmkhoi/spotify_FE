@@ -1,7 +1,9 @@
-// renderPlaylistData.js
 import formatTime from "../utils/formatTime.js";
 import setupTrackPlayEvents from "../setupEvents/setupTrackPlayEvents.js";
+import { setupFollowButton } from "./toggleFollowPlaylist.js";
 import { setCurrentTracks } from "../queue/trackState.js";
+import showEditForm from "./showEditForm.js";
+import {showDeleteConfirmModal} from "./deletePlaylist.js";
 
 
 const BASE_URL = 'http://spotify.f8team.dev';
@@ -9,12 +11,6 @@ const BASE_URL = 'http://spotify.f8team.dev';
 function renderPlaylistData(playlist, tracks) {
     const playlistHero = document.querySelector('.artist-hero');
     const popularTracksContainer = document.querySelector('.popular-section');
-
-    if (!playlist || !tracks) {
-        playlistHero.innerHTML = '<p class="no-data">Không có dữ liệu playlist!</p>';
-        popularTracksContainer.innerHTML = '<p class="no-data">Không có dữ liệu tracks!</p>';
-        return;
-    }
 
     setCurrentTracks(tracks);
 
@@ -25,18 +21,40 @@ function renderPlaylistData(playlist, tracks) {
         </div>
         <div class="hero-content">
             <h1 class="playlist-name">${playlist.name || 'Unknown Playlist'}</h1>
-            <p class="playlist-description">Playlist by ${playlist.description || 'You'}</p>
+            <p class="playlist-description">Playlist by ${playlist.user_display_name || playlist.description || 'You'}</p>
             <p class="track-count">${tracks.length} tracks</p>
         </div>
     `;
     playlistHero.dataset.playlistId = playlist.id || '';
 
     const controls = document.querySelector('.artist-controls');
+    // Chỉ render follow button nếu is_owned = false
+    const followButtonHTML = playlist.is_owner
+        ? ''
+        : `<button class="follow-btn" data-playlist-id="${playlist.id || ''}">${playlist.is_following ? 'Unfollow' : 'Follow'}</button>`;
+
+    const deleteButtonHTML = playlist.is_owner
+        ? `<button class="delete-playlist-btn" data-playlist-id="${playlist.id || ''}"><i class="fas fa-trash"></i> Xóa</button>`
+        : '';
+    
     controls.innerHTML = `
         <button class="play-btn-large">
             <i class="fas fa-play"></i>
         </button>
+        ${followButtonHTML}
+        ${deleteButtonHTML}
     `;
+
+     // Gắn event listener cho playlist-name và hero-overlay nếu là owner
+    if (playlist.is_owner) {
+        const playlistName = playlistHero.querySelector('.playlist-name');
+        const heroOverlay = playlistHero.querySelector('.hero-overlay');
+        const deleteBtn = controls.querySelector('.delete-playlist-btn');
+        playlistName.addEventListener('click', () => showEditForm(playlist));
+        heroOverlay.addEventListener('click', () => showEditForm(playlist));
+        deleteBtn?.addEventListener('click', () => showDeleteConfirmModal(playlist.id));
+        console.log('DEBUG: Edit listeners added for playlist:', playlist.id);
+    }
 
     popularTracksContainer.innerHTML = '';
     tracks.forEach((track, index) => {
@@ -70,6 +88,10 @@ function renderPlaylistData(playlist, tracks) {
         popularTracksContainer.appendChild(trackItem);
     });
     setupTrackPlayEvents();
+    if (!playlist.is_owner) {
+        console.log('DEBUG: Setting up follow button for playlist:', playlist.id);
+        setupFollowButton(playlist.id);
+    }
 }
 
 export default renderPlaylistData;

@@ -5,18 +5,22 @@ class HttpRequest {
 
     async _send(path, method, data, options = {}) {
         try {
-            const _options = {
-                ...options,
-                method: method,
-                headers: {
-                    ...options.headers,
-                    'Content-Type': 'application/json',
-                },
-            };
-            if (data) {
-                _options.body = JSON.stringify(data);
-            }
-            const res = await fetch(`${this.baseUrl}${path}`, _options);
+            const headers = { ...options.headers };
+            let body = data;
+
+            // Chỉ set Content-Type cho non-FormData
+            if (!(data instanceof FormData)) {
+                headers['Content-Type'] = 'application/json';
+                if (data) {
+                    body = JSON.stringify(data);
+                }
+            } 
+
+            const res = await fetch(`${this.baseUrl}${path}`, {
+                method,
+                headers,
+                body
+            });
 
             // Xử lý response rỗng (status 204)
             if (res.status === 204) {
@@ -48,12 +52,11 @@ class HttpRequest {
         }
     }
 
-
     async get(path, options = {}) {
         return await this._send(path, 'GET', null, options);
     }
 
-    async post(path, data = {}, options = {}) {
+    async post(path, data, options = {}) {
         return await this._send(path, 'POST', data, options);
     }
 

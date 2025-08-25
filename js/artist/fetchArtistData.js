@@ -12,11 +12,6 @@ async function fetchArtistData(artistId) {
         const tracks = tracksResponse.tracks || [];
         console.log('Tracks data:', tracks);
 
-        if (!artist || tracks.length === 0) {
-            showToast('Không tìm thấy dữ liệu artist hoặc tracks!', 'error');
-            return null;
-        }
-
         tracks.forEach(track => {
             track.artist_name = artist.name;
         });

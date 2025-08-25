@@ -7,10 +7,8 @@ function renderArtistData(artist, tracks) {
     const artistHero = document.querySelector('.artist-hero');
     const popularTracksContainer = document.querySelector('.popular-section');
 
-    if (!artist || !tracks) {
-        artistHero.innerHTML = '<p class="no-data">Không có dữ liệu artist!</p>';
+    if (tracks.length === 0) {
         popularTracksContainer.innerHTML = '<p class="no-data">Không có dữ liệu tracks!</p>';
-        return;
     }
 
     setCurrentTracks(tracks); // Set currentTracks in shared module

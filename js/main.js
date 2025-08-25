@@ -21,6 +21,7 @@ import setupHomeClickEvents from "./setupEvents/setupHomeClickEvents.js";
 import setupTrackPlayEvents from "./setupEvents/setupTrackPlayEvents.js";
 import fetchSidebarItems from "./sidebar/fetchSidebarItems.js";
 import { renderLibrary, setupLibraryTabs } from "./sidebar/renderLibrary.js";
+import createPlaylist from "./playlist/createPlaylist.js";
 //import setupFollowButton from "./setupClickEvents/setupFollowArtistEvents.js";
 
 
@@ -58,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentTimeEl = document.querySelector('.time:first-child');
     const totalTimeEl = document.querySelector('.time:last-child');
     const libraryContent = document.querySelector('.library-content');
+    const createPlaylistBtn = document.querySelector('.create-btn')
 
     // Auth Modal Event Listeners
     signupBtn?.addEventListener("click", () => {
@@ -276,6 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupLibraryTabs();
         renderLibrary();
     });
+    createPlaylistBtn?.addEventListener('click', createPlaylist);
     fetchPopularArtists().then(artists => {
         renderPopularArtists(artists.slice(0, 10));
         setupArtistClickEvents();

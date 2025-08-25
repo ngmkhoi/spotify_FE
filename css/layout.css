@@ -294,3 +294,184 @@
     font-size: 14px;
     color: var(--text-secondary);
 }
+
+/* Edit Playlist Modal */
+.edit-playlist-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-modal);
+}
+
+.edit-playlist-modal .modal-content {
+    background: var(--bg-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    max-width: 500px;
+    width: 90%;
+}
+
+.edit-playlist-modal h2 {
+    font-size: 20px;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.edit-playlist-modal .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.edit-playlist-modal label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.edit-playlist-modal input,
+.edit-playlist-modal textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.edit-playlist-modal textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.edit-playlist-modal .form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+.edit-playlist-modal button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+
+.edit-playlist-modal button[type="submit"] {
+    background: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.edit-playlist-modal button[type="submit"]:hover {
+    background: var(--accent-hover);
+}
+
+.edit-playlist-modal .cancel-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.edit-playlist-modal .cancel-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* Cursor cho playlist-name và hero-overlay khi là owner */
+.playlist-name, .hero-overlay {
+    cursor: default;
+}
+
+.playlist-name[editable], .hero-overlay[editable] {
+    cursor: pointer;
+}
+
+/* Delete Playlist Button */
+.delete-playlist-btn {
+    background-color: transparent;
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.delete-playlist-btn i {
+    font-size: 16px;
+}
+
+.delete-playlist-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+}
+
+/* Delete Confirmation Modal */
+.delete-playlist-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-modal);
+}
+
+.delete-playlist-modal .modal-content {
+    background: var(--bg-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.delete-playlist-modal h2 {
+    font-size: 18px;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.delete-playlist-modal p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.delete-playlist-modal .form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+}
+
+.delete-playlist-modal button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+
+.delete-playlist-modal .confirm-delete-btn {
+    background: #ff4d4d; /* Màu đỏ để nhấn mạnh hành động xóa */
+    color: var(--text-primary);
+}
+
+.delete-playlist-modal .confirm-delete-btn:hover {
+    background: #ff6666;
+}
+
+.delete-playlist-modal .cancel-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.delete-playlist-modal .cancel-btn:hover {
+    background: var(--bg-hover);
+}
